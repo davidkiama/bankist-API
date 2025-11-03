@@ -107,8 +107,8 @@ export const deposit = async (req, res) => {
     // Return the URL to the client
     res.status(200).json({ paymentUrl });
   } catch (error) {
-    console.log("paymentUrl", paymentUrl);
-    console.log("response", response);
+    console.error("paymentUrl", paymentUrl);
+    console.error("response", response);
     console.error("Deposit Error:", error.response?.data || error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
