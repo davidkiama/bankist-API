@@ -87,8 +87,8 @@ export const deposit = async (req, res) => {
       to_currency: "USDT",
       auto_withdrawal: false,
       mixed_payment: true,
-      callback_url: `${process.env.PUBLIC_BASE_URL}/api/webhook/oxapay`,
-      return_url: `${process.env.PUBLIC_BASE_URL}/success`,
+      callback_url: `${PUBLIC_BASE_URL}/api/webhook/oxapay`,
+      return_url: `${PUBLIC_BASE_URL}/success`,
       email: user.email,
       order_id: `ORD-${Date.now()}`,
       thanks_message: "Thanks for your payment!",
@@ -107,6 +107,8 @@ export const deposit = async (req, res) => {
     // Return the URL to the client
     res.status(200).json({ paymentUrl });
   } catch (error) {
+    console.log("paymentUrl", paymentUrl);
+    console.log("response", response);
     console.error("Deposit Error:", error.response?.data || error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
