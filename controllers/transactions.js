@@ -77,6 +77,9 @@ export const deposit = async (req, res) => {
       merchant_api_key: OXAPAY_API_KEY,
       "Content-Type": "application/json",
     };
+    console.log("amout", amount);
+    console.error("headers", headers);
+    console.error("amount", amount);
 
     const data = {
       amount,
