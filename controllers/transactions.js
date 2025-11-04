@@ -5,115 +5,117 @@ import axios from "axios";
 
 dotenv.config();
 
-const OXAPAY_API_KEY = process.env.OXAPAY_API_KEY;
-const OXAPAY_CREATE_INVOICE_URL = process.env.OXAPAY_CREATE_INVOICE_URL;
-
-const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL;
-
-// export const deposit = async (req, res) => {
-//   const { amount } = req.body;
-
-//   if (!req.userId) return res.status(401).json({ message: "Unauthorized" });
-
-//   //Get user so as to add new trx
-//   const user = await User.findById(req.userId);
-//   if (!user) return res.status(401).json({ message: "User does not exist" });
-
-//   const url = process.env.OXAPAY_CREATE_INVOICE_URL;
-
-//   const headers = {
-//     merchant_api_key: process.env.OXAPAY_API_KEY,
-//     "Content-Type": "application/json",
-//   };
-
-//   const data = {
-//     amount: amount,
-//     currency: "USD",
-//     lifetime: 30,
-//     fee_paid_by_payer: 1,
-//     under_paid_coverage: 2.5,
-//     to_currency: "USDT",
-//     auto_withdrawal: false,
-//     mixed_payment: true,
-//     callback_url: "https://example.com/callback",
-//     return_url: "https://example.com/success",
-//     email: "customer@oxapay.com",
-//     order_id: "ORD-12345",
-//     thanks_message: "Thanks message",
-//     description: "Order #12345",
-//     sandbox: false,
-//   };
-
-//   let paymentUrl = "";
-
-//   axios
-//     .post(url, data, { headers })
-//     .then((response) => {
-//       console.log(response.data);
-
-//       paymentUrl = response?.data?.data?.payment_url;
-//       console.log("URL TO PAY", paymentUrl);
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
-// };
-
-// dotenv.config();
-
 // const OXAPAY_API_KEY = process.env.OXAPAY_API_KEY;
 // const OXAPAY_CREATE_INVOICE_URL = process.env.OXAPAY_CREATE_INVOICE_URL;
+
+// const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL;
 
 export const deposit = async (req, res) => {
   const { amount } = req.body;
 
   if (!req.userId) return res.status(401).json({ message: "Unauthorized" });
 
+  //Get user so as to add new trx
   const user = await User.findById(req.userId);
-  if (!user) return res.status(404).json({ message: "User not found" });
+  if (!user) return res.status(401).json({ message: "User does not exist" });
 
-  try {
-    const headers = {
-      merchant_api_key: OXAPAY_API_KEY,
-      "Content-Type": "application/json",
-    };
-    console.log("amout", amount);
-    console.error("headers", headers);
-    console.error("amount", amount);
+  const url = process.env.OXAPAY_CREATE_INVOICE_URL;
 
-    const data = {
-      amount,
-      currency: "USD",
-      lifetime: 30,
-      fee_paid_by_payer: 1,
-      under_paid_coverage: 2.5,
-      to_currency: "USDT",
-      auto_withdrawal: false,
-      mixed_payment: true,
-      callback_url: `${PUBLIC_BASE_URL}/api/webhook/oxapay`,
-      return_url: `${PUBLIC_BASE_URL}/success`,
-      email: user.email,
-      order_id: `ORD-${Date.now()}`,
-      thanks_message: "Thanks for your payment!",
-      description: `Deposit for user ${user._id}`,
-      sandbox: false,
-    };
+  const headers = {
+    merchant_api_key: process.env.OXAPAY_API_KEY,
+    "Content-Type": "application/json",
+  };
 
-    const response = await axios.post(OXAPAY_CREATE_INVOICE_URL, data, { headers });
+  const data = {
+    amount: amount,
+    currency: "USD",
+    lifetime: 30,
+    fee_paid_by_payer: 1,
+    under_paid_coverage: 2.5,
+    to_currency: "USDT",
+    auto_withdrawal: false,
+    mixed_payment: true,
+    callback_url: "https://example.com/callback",
+    return_url: "https://example.com/success",
+    email: "customer@oxapay.com",
+    order_id: "ORD-12345",
+    thanks_message: "Thanks message",
+    description: "Order #12345",
+    sandbox: false,
+  };
 
-    const paymentUrl = response?.data?.data?.payment_url;
+  let paymentUrl = "";
 
-    if (!paymentUrl) {
-      return res.status(400).json({ message: "Failed to generate payment URL" });
-    }
+  axios
+    .post(url, data, { headers })
+    .then((response) => {
+      console.log(response.data);
 
-    // Return the URL to the client
-    res.status(200).json({ paymentUrl });
-  } catch (error) {
-    console.error("Deposit Error:", error.response?.data || error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
+      paymentUrl = response?.data?.data?.payment_url;
+      console.log("URL TO PAY", paymentUrl);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
+
+dotenv.config();
+
+const OXAPAY_API_KEY = process.env.OXAPAY_API_KEY;
+const OXAPAY_CREATE_INVOICE_URL = process.env.OXAPAY_CREATE_INVOICE_URL;
+
+// export const deposit = async (req, res) => {
+//   const { amount } = req.body;
+
+//   if (!req.userId) return res.status(401).json({ message: "Unauthorized" });
+
+//   const user = await User.findById(req.userId);
+//   if (!user) return res.status(404).json({ message: "User not found" });
+
+//   try {
+//     const headers = {
+//       merchant_api_key: OXAPAY_API_KEY,
+//       "Content-Type": "application/json",
+//     };
+//     console.log("amout", amount);
+//     console.error("headers", headers);
+//     console.error("amount", amount);
+
+//     const data = {
+//       amount,
+//       currency: "USD",
+//       lifetime: 30,
+//       fee_paid_by_payer: 1,
+//       under_paid_coverage: 2.5,
+//       to_currency: "USDT",
+//       auto_withdrawal: false,
+//       mixed_payment: true,
+//       callback_url: `${PUBLIC_BASE_URL}/api/webhook/oxapay`,
+//       return_url: `${PUBLIC_BASE_URL}/success`,
+//       email: user.email,
+//       order_id: `ORD-${Date.now()}`,
+//       thanks_message: "Thanks for your payment!",
+//       description: `Deposit for user ${user._id}`,
+//       sandbox: false,
+//     };
+
+//     const response = await axios.post("https://api.oxapay.com/merchant/create_invoice", data, {
+//       headers,
+//     });
+
+//     const paymentUrl = response?.data?.data?.payment_url;
+
+//     if (!paymentUrl) {
+//       return res.status(400).json({ message: "Failed to generate payment URL" });
+//     }
+
+//     // Return the URL to the client
+//     res.status(200).json({ paymentUrl });
+//   } catch (error) {
+//     console.error("Deposit Error:", error.response?.data || error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
 
 export const withdraw = async (req, res) => {
   let { amount } = req.body;
